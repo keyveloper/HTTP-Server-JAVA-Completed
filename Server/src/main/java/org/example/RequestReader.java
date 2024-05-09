@@ -2,9 +2,7 @@ package org.example;
 
 import lombok.Data;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 
 @Data
@@ -13,13 +11,45 @@ public class RequestReader {
     private final Socket clientSocket;
     public void readRequest() {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
             while (true) {
-                String line = reader.readLine();
+
                 System.out.println("readRequest: " + line + "\n");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String readLine(DataInputStream dataInputStream) {
+        StringBuilder line = new StringBuilder();
+        char c;
+        boolean rFlag = false;
+
+        while (true) {
+            try {
+                byte readByte = dataInputStream.readByte();
+                if (readByte == -1) {
+                    return null;
+                }
+
+                c = (char) readByte;
+
+                if (rFlag && c == '\n') {
+                    break;
+                }
+
+                rFlag = (c == '\r');
+
+                if (!rFlag) {
+                    line.append(c);
+                }
+            } catch (IOException e) {
+                System.out.println("In readRequest readLine IOException: " + e.getMessage());
+            }
+        }
+
+        return line.toString();
+
     }
 }

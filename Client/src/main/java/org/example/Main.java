@@ -14,7 +14,7 @@ public class Main {
 
         try {
 
-        while (1) {
+        while (true) {
                 String command = bufferedReader.readLine();
                 client.processCommand(command);
             }

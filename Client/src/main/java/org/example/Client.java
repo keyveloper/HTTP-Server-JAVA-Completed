@@ -8,21 +8,21 @@ import java.net.Socket;
 public class Client{
     private final Socket socket = new Socket();
     private final String hostName;
-    private ResponseReader clientPacketReceiver;
-    private RequestSender clientRequestSender;
+    private ResponseReader responseReader;
+    private RequestSender requestSender;
 
     public void run() {
-        clientPacketReceiver = new ResponseReader(this);
-        clientRequestSender = new RequestSender(this);
-        Thread handlerThread = new Thread(clientPacketReceiver);
+        responseReader = new ResponseReader(this);
+        requestSender = new RequestSender(this);
+        Thread handlerThread = new Thread(responseReader);
         handlerThread.start();
     }
 
     public void processCommand(String command) {
-        sendRequest(CommandProcessor.extractRequest(command));
+        processRequest(CommandProcessor.extractRequest(command));
     }
 
-    private void sendRequest(Request request) {
-        clientRequestSender.sendRequest(request);
+    private void processRequest(Request request) {
+        requestSender.divideRequest(request);
     }
 }
