@@ -8,17 +8,14 @@ import java.net.Socket;
 
 @Data
 public class ClientHandler implements Runnable{
+    private final Server owner;
     private final Socket client;
+    private final RequestReader requestReader;
     @Override
     public void run() {
         while (true) {
-            try {
-                DataInputStream dataInputStream = new DataInputStream(client.getInputStream());
-
-
-            } catch (IOException e) {
-                System.out.println("ClientHandlerIOException: " + e.getMessage());
-            }
+            RequestMessage requestMessage = requestReader.readRequest();
+            owner.service(requestMessage);
         }
     }
 }

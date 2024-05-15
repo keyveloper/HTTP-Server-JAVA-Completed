@@ -19,10 +19,19 @@ public class Client{
     }
 
     public void processCommand(String command) {
-        processRequest(CommandProcessor.extractRequest(command));
+        ProcessedCommand processedCommand = CommandProcessor.extractRequest(command);
+        if (processedCommand == null) {
+            // null -> wrong command
+            System.out.println("Wrong Command");
+        } else {
+            byte[] requestPacket = makeHttpPacket(processedCommand);
+            requestSender.sendHttpPacket(requestPacket);
+        }
     }
 
-    private void processRequest(Request request) {
-        requestSender.divideRequest(request);
+    private byte[] makeHttpPacket(ProcessedCommand processedCommand) {
+        return RequestHeadAdder.addHeader(processedCommand.getMethod(), processedCommand.getUri(), hostName,
+                processedCommand.getJsonBody());
+
     }
 }

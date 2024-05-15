@@ -1,13 +1,10 @@
 package org.example;
 
 public class CommandProcessor {
-    public static Request extractRequest(String command) {
-        if (command.startsWith("/gettime")) {
-            return new Request(RequestCode.GET_TIME);
-        }
-
-        if (command.startsWith("/posttext")) {
-            Request request = new Request(RequestCode.POST_TEXT);
+    public static ProcessedCommand extractRequest(String command) {
+        if (command.startsWith("get ") || command.startsWith("GET ")) {
+            String uri = command.substring(4);
+            return new ProcessedCommand("GET", uri);
         }
 
         return null;
