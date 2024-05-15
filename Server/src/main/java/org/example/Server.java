@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 @Data
 public class Server {
     private final int port = 8080;
-    private final ServiceProcessor  serviceProcessor= new ServiceProcessor();
+    private final RequestHandler requestHandler;
 
     public void start() {
         try {
@@ -28,7 +28,7 @@ public class Server {
     }
 
     public void service(RequestMessage requestMessage) {
-        byte[] resultBytes = serviceProcessor.service(requestMessage);
+        byte[] resultBytes = requestHandler.handleRequest(requestMessage);
 
     }
 

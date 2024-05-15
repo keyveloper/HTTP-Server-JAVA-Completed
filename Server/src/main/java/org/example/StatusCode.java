@@ -1,12 +1,19 @@
 package org.example;
 
-import java.util.Map;
+import lombok.Getter;
 
-public class StatusCode {
-    public static final Map<Integer, String> STATUS_CODES = Map.of(
-            200, "OK",
-            400, "BAD_REQUEST",
-            404, "NOT_FOUND",
-            500, "INTERNAL_SERVER_ERROR"
-    )
+@Getter
+public enum StatusCode {
+    OK(200, "OK"),
+    NOT_FOUND(404, "Not found"),
+    BAD_REQUEST(400, "Bad Request"),
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error");
+
+    private final int code;
+    private final String reasonPhrase;
+
+    StatusCode(int code, String reasonPhrase) {
+        this.code = code;
+        this.reasonPhrase = reasonPhrase;
+    }
 }
