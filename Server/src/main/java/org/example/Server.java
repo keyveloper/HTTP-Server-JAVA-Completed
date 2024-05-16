@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 public class Server {
     private final int port = 8080;
     private final RequestHandler requestHandler;
+    private final ResponseSender responseSender;
 
     public void start() {
         try {
