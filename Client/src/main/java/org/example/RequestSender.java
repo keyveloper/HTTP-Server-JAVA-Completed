@@ -16,7 +16,7 @@ public class RequestSender {
             dateOutputStream.write(httpPacket);
             dateOutputStream.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Request Sender error: " + e.getMessage());
         }
     }
 }

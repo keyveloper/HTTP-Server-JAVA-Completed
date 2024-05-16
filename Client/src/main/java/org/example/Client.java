@@ -8,18 +8,17 @@ import java.net.Socket;
 public class Client{
     private final Socket socket = new Socket();
     private final String hostName;
-    private ResponseReader responseReader;
-    private RequestSender requestSender;
     private CommandProcessor commandProcessor = new CommandProcessor(this);
 
     public void run() {
-        responseReader = new ResponseReader(this);
-        requestSender = new RequestSender(this);
-        Thread handlerThread = new Thread(responseReader);
-        handlerThread.start();
+        while (true) {
+            ResponseReader responseReader = new ResponseReader(socket);
+
+        }
     }
 
     public void processCommand(String command) {
+        RequestSender requestSender = new RequestSender(this);
         Request request = commandProcessor.extractRequest(command);
         if (request == null) {
             // null -> wrong command
