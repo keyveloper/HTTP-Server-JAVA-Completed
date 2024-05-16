@@ -2,5 +2,4 @@ rootProject.name = 'HTTP'
 include 'Server'
 include 'untitled'
 include 'Client'
-include 'Share'
 

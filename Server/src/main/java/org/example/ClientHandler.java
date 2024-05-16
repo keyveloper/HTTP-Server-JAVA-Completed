@@ -1,22 +1,32 @@
 package org.example;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.net.Socket;
 
-@Data
+@AllArgsConstructor
 public class ClientHandler implements Runnable{
-    private final Server server;
     private final Socket client;
-    private final RequestReader requestReader = new RequestReader(server, client);
-    private final ResponseSender responseSender = new ResponseSender(client);
+
+
     @Override
     public void run() {
+        RequestReader requestReader = new RequestReader(client);
         while (true) {
             RequestMessage requestMessage = requestReader.readRequest();
-            server.service(requestMessage);
+            processRequest(requestMessage);
         }
+    }
+
+    private void processRequest(RequestMessage requestMessage) {
+        RequestHandler requestHandler = new RequestHandler(this);
+        requestHandler.handleRequest(requestMessage);
+    }
+
+    public void sendHttpResponse(Response response) {
+        ResponseSender responseSender = new ResponseSender(client);
+        // send ResponsePacket with http header
+        responseSender.sendHttpResponse(HttpResponseMaker.makePacket(response));
     }
 }

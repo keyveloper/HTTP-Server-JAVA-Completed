@@ -7,12 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @AllArgsConstructor
 public class RequestHandler {
-    private final Server server;
+    private final ClientHandler clientHandler;
 
     public void handleRequest(RequestMessage requestMessage) {
         switch (requestMessage.getMethod()) {
@@ -42,16 +41,13 @@ public class RequestHandler {
         String body = getNowTime();
         if (body == null) {
             Response response = new Response(protocol, StatusCode.SERVICE_UNAVAILABLE, null);
-            byte[] responseBytes = HttpResponseMaker.makePacket(response);
-            server.getResponseSender().sendHttpResponse(responseBytes);
+            clientHandler.sendHttpResponse(response);
             return;
         }
         Response response = new Response(protocol, StatusCode.OK, body);
         response.setBodyLength(body.length());
         response.setBodyType("application/json");
-
-        byte[] responseBytes = HttpResponseMaker.makePacket(response);
-        server.getResponseSender().sendHttpResponse(responseBytes);
+        clientHandler.sendHttpResponse(response);
     }
 
     private String getNowTime() {

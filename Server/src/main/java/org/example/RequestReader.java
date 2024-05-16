@@ -12,7 +12,6 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class RequestReader {
-    private final Server owner;
     private final Socket clientSocket;
     public RequestMessage readRequest() {
         try {

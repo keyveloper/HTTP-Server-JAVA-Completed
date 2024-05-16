@@ -12,15 +12,12 @@ import java.util.logging.Logger;
 @Data
 public class Server {
     private final int port = 8080;
-    private final RequestHandler requestHandler;
-    private final ResponseSender responseSender;
-
     public void start() {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                ClientHandler clientHandler = new ClientHandler(this, clientSocket);
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
                 Thread clientThread = new Thread(clientHandler);
                 clientThread.start();
             }
@@ -28,9 +25,4 @@ public class Server {
             System.out.println("ServerIOException: " + e.getMessage());
         }
     }
-
-    public void service(RequestMessage requestMessage) {
-        requestHandler.handleRequest(requestMessage);
-    }
-
 }
