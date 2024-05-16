@@ -7,11 +7,11 @@ import java.io.IOException;
 
 @Data
 public class RequestSender {
-    private final Client owner;
+    private final Client client;
 
     public void sendHttpRequest(byte[] httpPacket) {
         try {
-            DataOutputStream dateOutputStream = new DataOutputStream(owner.getSocket().getOutputStream());
+            DataOutputStream dateOutputStream = new DataOutputStream(client.getSocket().getOutputStream());
             dateOutputStream.writeInt(httpPacket.length);
             dateOutputStream.write(httpPacket);
             dateOutputStream.flush();

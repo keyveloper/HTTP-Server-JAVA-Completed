@@ -10,6 +10,7 @@ public class Client{
     private final String hostName;
     private ResponseReader responseReader;
     private RequestSender requestSender;
+    private CommandProcessor commandProcessor = new CommandProcessor(this);
 
     public void run() {
         responseReader = new ResponseReader(this);
@@ -19,19 +20,14 @@ public class Client{
     }
 
     public void processCommand(String command) {
-        ProcessedCommand processedCommand = CommandProcessor.extractRequest(command);
-        if (processedCommand == null) {
+        Request request = commandProcessor.extractRequest(command);
+        if (request == null) {
             // null -> wrong command
             System.out.println("Wrong Command");
         } else {
-            byte[] requestPacket = makeHttpPacket(processedCommand);
-            requestSender.sendHttpPacket(requestPacket);
+            byte[] requestPacket = HttpRequestMaker.makeHttpRequest(request);
+            requestSender.sendHttpRequest(requestPacket);
         }
     }
 
-    private byte[] makeHttpPacket(ProcessedCommand processedCommand) {
-        return RequestHeadAdder.addHeader(processedCommand.getMethod(), processedCommand.getUri(), hostName,
-                processedCommand.getJsonBody());
-
-    }
 }
