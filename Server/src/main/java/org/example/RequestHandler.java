@@ -40,22 +40,29 @@ public class RequestHandler {
 
     private void sendTimeResponse(String protocol) {
         String body = getNowTime();
+        if (body == null) {
+            Response response = new Response(protocol, StatusCode.SERVICE_UNAVAILABLE, null);
+            byte[] responseBytes = HttpResponseMaker.makePacket(response);
+            server.getResponseSender().sendHttpResponse(responseBytes);
+            return;
+        }
         Response response = new Response(protocol, StatusCode.OK, body);
         response.setBodyLength(body.length());
         response.setBodyType("application/json");
 
         byte[] responseBytes = HttpResponseMaker.makePacket(response);
-        server.getResponseSender().sendResponse(responseBytes);
+        server.getResponseSender().sendHttpResponse(responseBytes);
     }
 
     private String getNowTime() {
-        LocalDateTime now = LocalDateTime.now();
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
         try {
+            LocalDateTime now = LocalDateTime.now();
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
             return objectMapper.writeValueAsString(now);
         } catch (JsonProcessingException e) {
             System.out.println("getNowTime error: " + e.getMessage());
         }
+        return null;
     }
 }

@@ -10,7 +10,8 @@ import java.net.Socket;
 public class ClientHandler implements Runnable{
     private final Server server;
     private final Socket client;
-    private final RequestReader requestReader;
+    private final RequestReader requestReader = new RequestReader(server, client);
+    private final ResponseSender responseSender = new ResponseSender(client);
     @Override
     public void run() {
         while (true) {

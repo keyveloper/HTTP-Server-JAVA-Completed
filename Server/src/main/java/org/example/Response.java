@@ -10,5 +10,4 @@ public class Response {
     private int bodyLength;
     private String bodyType;
     private final String responseJsonBody;
-
 }

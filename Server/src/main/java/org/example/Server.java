@@ -6,6 +6,7 @@ import lombok.Data;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 @Data
@@ -19,7 +20,7 @@ public class Server {
             ServerSocket serverSocket = new ServerSocket(port);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                ClientHandler clientHandler = new ClientHandler(this, clientSocket, new RequestReader(this, clientSocket));
+                ClientHandler clientHandler = new ClientHandler(this, clientSocket);
                 Thread clientThread = new Thread(clientHandler);
                 clientThread.start();
             }
@@ -29,8 +30,7 @@ public class Server {
     }
 
     public void service(RequestMessage requestMessage) {
-        byte[] resultBytes = requestHandler.handleRequest(requestMessage);
-
+        requestHandler.handleRequest(requestMessage);
     }
 
 }

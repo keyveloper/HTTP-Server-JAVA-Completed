@@ -9,7 +9,7 @@ import java.io.IOException;
 public class RequestSender {
     private final Client owner;
 
-    public void sendHttpPacket(byte[] httpPacket) {
+    public void sendHttpRequest(byte[] httpPacket) {
         try {
             DataOutputStream dateOutputStream = new DataOutputStream(owner.getSocket().getOutputStream());
             dateOutputStream.writeInt(httpPacket.length);
