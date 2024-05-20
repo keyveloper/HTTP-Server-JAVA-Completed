@@ -58,7 +58,7 @@ public class ResponseReader implements Runnable {
             while ((line = BufferedReader.readLine()) != null) {
                 System.out.println(" read line: " + line + "\n");
                 if (line.isEmpty()) {
-                    System.out.println("d?");
+                    System.out.println("read Body!!");
                     isBody = true;
                     continue;
                 }
@@ -81,11 +81,9 @@ public class ResponseReader implements Runnable {
             }
 
             // body Parsing
-            System.out.println("body: " + body.toString());
+            System.out.println("body: " + body);
             System.out.println("start to read body: {\n" );
             ObjectMapper objectMapper = new ObjectMapper();
-
-
 
             System.out.println("]return request!! \n");
 

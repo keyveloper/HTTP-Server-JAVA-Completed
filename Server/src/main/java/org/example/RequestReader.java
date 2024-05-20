@@ -42,14 +42,28 @@ public class RequestReader {
             // Header Parsing
             System.out.println("start to read header: {\n" );
             Map<String, String> headerMap = new HashMap<>();
-            while (!((line = reader.readLine()) == null)) {
+            StringBuilder body = new StringBuilder();
+            boolean isBody = false;
+            while ((line = reader.readLine()) != null) {
                 System.out.println(" read line: " + line + "\n");
-                int idx = line.indexOf(": ");
-                if (idx != -1) {
-                    String key = line.substring(0, idx).trim();
-                    String value = line.substring(idx + 1).trim();
-                    headerMap.put(key, value);
+                if (line.isEmpty()) {
+                    System.out.println("read Body!!");
+                    isBody = true;
+                    continue;
                 }
+
+                if (isBody) {
+                    body.append(line);
+                } else {
+                    int idx = line.indexOf(": ");
+                    if (idx != -1) {
+                        String key = line.substring(0, idx).trim();
+                        String value = line.substring(idx + 1).trim();
+                        headerMap.put(key, value);
+                    }
+
+                }
+
             }
             System.out.println("}\n all header read! \n");
 
@@ -58,22 +72,9 @@ public class RequestReader {
             }
 
             // Body Parsing
-            System.out.println("start to read body: {\n" );
-            StringBuilder body = new StringBuilder();
-            if (headerMap.containsKey("Content-Length")) {
-                int contentLength = Integer.parseInt(headerMap.get("Content-Length"));
-                char[] bodyChars = new char[contentLength];
-                int charsRead = reader.read(bodyChars, 0, contentLength);
-                body.append(bodyChars, 0, charsRead);
-            }
-
             System.out.println("body: " + body);
-            if (!body.toString().isEmpty()) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                // add Object -> Json logics
-            } else {
-                System.out.println("received Empty body!");
-            }
+            System.out.println("start to read body: {\n" );
+            ObjectMapper objectMapper = new ObjectMapper();
 
             System.out.println("]return request!! \n");
 
