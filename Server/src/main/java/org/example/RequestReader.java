@@ -1,8 +1,8 @@
 package org.example;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 
 import java.io.*;
 import java.net.Socket;
@@ -15,40 +15,73 @@ public class RequestReader {
     private final Socket clientSocket;
     public RequestMessage readRequest() {
         try {
+            System.out.println("Reading Request...[ \n");
             DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
+
             int packetLength = dataInputStream.readInt();
             byte[] httpPacket = new byte[packetLength];
             dataInputStream.readFully(httpPacket);
+            System.out.println("read packet Length: " + packetLength + "\n");
+            System.out.println("httpPacket: " + Arrays.toString(httpPacket) + "\n");
 
             String httpRequest = new String(httpPacket);
-            BufferedReader reader = new BufferedReader(new StringReader(httpRequest));
+            System.out.println("http Packet to String: \n" + httpRequest + "\n");
 
+            System.out.println("start to read request line : {\n" );
+            BufferedReader reader = new BufferedReader(new StringReader(httpRequest));
             // Request Parsing
             String line = reader.readLine();
+            System.out.println("read request line: " + line + "\n");
             String[] requestLine = line.split(" ");
             String method = requestLine[0];
             String uri = requestLine[1];
             String httpVersion = requestLine[2];
-
+            System.out.println("requestLine: " + Arrays.toString(requestLine) + "\b");
+            System.out.println("method, uri, httpVersion: " + method + uri + httpVersion + "\n");
+            System.out.println("}\n all request line read!!\n");
 
             // Header Parsing
+            System.out.println("start to read header: {\n" );
             Map<String, String> headerMap = new HashMap<>();
-            while (!(line = reader.readLine()).isEmpty()) {
-                String[] header = line.split(" ");
-                headerMap.put(header[0], header[1]);
+            while (!((line = reader.readLine()) == null)) {
+                System.out.println(" read line: " + line + "\n");
+                int idx = line.indexOf(": ");
+                if (idx != -1) {
+                    String key = line.substring(0, idx).trim();
+                    String value = line.substring(idx + 1).trim();
+                    headerMap.put(key, value);
+                }
+            }
+            System.out.println("}\n all header read! \n");
+
+            for (String key : headerMap.keySet()) {
+                System.out.println("Key: " + key + ", Value: " + headerMap.get(key));
             }
 
             // Body Parsing
+            System.out.println("start to read body: {\n" );
             StringBuilder body = new StringBuilder();
             ObjectMapper objectMapper = new ObjectMapper();
             if (headerMap.containsKey("Content-Length")) {
                 int contentLength = Integer.parseInt(headerMap.get("Content-Length"));
                 char[] bodyChars = new char[contentLength];
                 int charsRead = reader.read(bodyChars, 0, contentLength);
-                reader.read(bodyChars, 0, contentLength);
                 body.append(bodyChars, 0, charsRead);
             }
-            Map<String, Object> bodyMap = objectMapper.readValue(body.toString(), Map.class);
+
+            System.out.println("body: " + body);
+            Map<String, Object> bodyMap = null;
+            if (!body.toString().isEmpty()) {
+                bodyMap = objectMapper.readValue(body.toString(), new TypeReference<>() {
+                });
+                for (String key : bodyMap.keySet()) {
+                    System.out.println("Key: " + key + ", Value: " + bodyMap.get(key));
+                }
+            } else {
+                System.out.println("received Empty body!");
+            }
+
+            System.out.println("]return request!! \n");
 
             return  new RequestMessage(method, uri, httpVersion, headerMap, bodyMap);
 

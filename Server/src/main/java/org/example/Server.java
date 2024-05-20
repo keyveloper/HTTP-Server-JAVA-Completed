@@ -16,7 +16,11 @@ public class Server {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             while (true) {
+                System.out.println("[Waiting Client,,,]");
                 Socket clientSocket = serverSocket.accept();
+                System.out.println("Connected " + clientSocket.getLocalPort() + " Port, From " +
+                        clientSocket.getRemoteSocketAddress().toString() + "\n");
+
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 Thread clientThread = new Thread(clientHandler);
                 clientThread.start();

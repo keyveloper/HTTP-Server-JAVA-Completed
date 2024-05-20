@@ -12,9 +12,11 @@ public class HttpRequestMaker {
                 .append("Host: ").append(request.getHostName()).append("\r\n");
         if (request.getRequestJsonBody() != null) {
             requestString.append("Content-Type: ").append(request.getContentType()).append("\r\n")
-                    .append("Content-Length: ").append(request.getContentLength()).append("\r\n");
+                    .append("Content-Length: ").append(request.getContentLength()).append("\r\n")
+                    .append(request.getRequestJsonBody());
+
         }
-        requestString.append(request.getRequestJsonBody());
+        System.out.println("HttpRequestMaker: add header on request: \n" + requestString + "\n");
 
         return requestString.toString().getBytes();
     }

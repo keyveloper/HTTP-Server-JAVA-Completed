@@ -14,6 +14,8 @@ public class RequestHandler {
     private final ClientHandler clientHandler;
 
     public void handleRequest(RequestMessage requestMessage) {
+        System.out.println("handle Request start!! \n" + requestMessage);
+        System.out.println("handle" + requestMessage.getMethod() + " " + requestMessage.getUri());
         switch (requestMessage.getMethod()) {
             case "GET" -> handleGet(requestMessage);
 
@@ -38,6 +40,7 @@ public class RequestHandler {
     }
 
     private void sendTimeResponse(String protocol) {
+        System.out.println("start to send Time response!! \n");
         String body = getNowTime();
         if (body == null) {
             Response response = new Response(protocol, StatusCode.SERVICE_UNAVAILABLE, null);
@@ -47,6 +50,8 @@ public class RequestHandler {
         Response response = new Response(protocol, StatusCode.OK, body);
         response.setBodyLength(body.length());
         response.setBodyType("application/json");
+        System.out.println("Response made: " + response + "\n");
+        System.out.println("Response JsonBody: " + body);
         clientHandler.sendHttpResponse(response);
     }
 
