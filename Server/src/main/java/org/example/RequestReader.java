@@ -1,6 +1,5 @@
 package org.example;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 
@@ -61,7 +60,6 @@ public class RequestReader {
             // Body Parsing
             System.out.println("start to read body: {\n" );
             StringBuilder body = new StringBuilder();
-            ObjectMapper objectMapper = new ObjectMapper();
             if (headerMap.containsKey("Content-Length")) {
                 int contentLength = Integer.parseInt(headerMap.get("Content-Length"));
                 char[] bodyChars = new char[contentLength];
@@ -70,20 +68,16 @@ public class RequestReader {
             }
 
             System.out.println("body: " + body);
-            Map<String, Object> bodyMap = null;
             if (!body.toString().isEmpty()) {
-                bodyMap = objectMapper.readValue(body.toString(), new TypeReference<>() {
-                });
-                for (String key : bodyMap.keySet()) {
-                    System.out.println("Key: " + key + ", Value: " + bodyMap.get(key));
-                }
+                ObjectMapper objectMapper = new ObjectMapper();
+                // add Object -> Json logics
             } else {
                 System.out.println("received Empty body!");
             }
 
             System.out.println("]return request!! \n");
 
-            return  new RequestMessage(method, uri, httpVersion, headerMap, bodyMap);
+            return  new RequestMessage(method, uri, httpVersion, headerMap, null);
 
         } catch (IOException e) {
             throw new RuntimeException(e);

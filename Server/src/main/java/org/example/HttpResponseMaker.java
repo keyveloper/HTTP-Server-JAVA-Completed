@@ -12,7 +12,8 @@ public class HttpResponseMaker {
         if (response.getResponseJsonBody() != null){
             responseString.append("Content-Type: ").append(response.getBodyType()).append("\r\n")
                     .append("Content-Length: ").append(response.getBodyLength()).append("\r\n")
-                    .append("Connection: close\r\n");
+                    .append("Connection: close\r\n")
+                    .append("\r\n");
             responseString.append(response.getResponseJsonBody());
             return responseString.toString().getBytes();
         }

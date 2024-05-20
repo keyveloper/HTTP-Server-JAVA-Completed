@@ -11,7 +11,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
 
 @Data
 public class ResponseReader implements Runnable {
@@ -37,10 +37,10 @@ public class ResponseReader implements Runnable {
             System.out.println("http Packet to String: \n" + httpResponse + "\n");
 
             System.out.println("start to read request line : {\n" );
-            BufferedReader reader = new BufferedReader(new StringReader(httpResponse));
+            BufferedReader BufferedReader = new BufferedReader(new StringReader(httpResponse));
 
             // status Parsing;
-            String line = reader.readLine();
+            String line = BufferedReader.readLine();
             System.out.println("read status line: " + line + "\n");
             String[] statusLines = line.split(" ");
             String protocol = statusLines[0];
@@ -53,13 +53,25 @@ public class ResponseReader implements Runnable {
             // Header Parsing
             System.out.println("start to read header: {\n" );
             Map<String, String> headerMap = new HashMap<>();
-            while (!((line = reader.readLine()) == null) && !line.isEmpty()) {
+            StringBuilder body = new StringBuilder();
+            boolean isBody = false;
+            while ((line = BufferedReader.readLine()) != null) {
                 System.out.println(" read line: " + line + "\n");
-                int idx = line.indexOf(": ");
-                if (idx != -1) {
-                    String key = line.substring(0, idx).trim();
-                    String value = line.substring(idx + 1).trim();
-                    headerMap.put(key, value);
+                if (line.isEmpty()) {
+                    System.out.println("d?");
+                    isBody = true;
+                    continue;
+                }
+                if (isBody) {
+                    body.append(line);
+
+                } else {
+                    int idx = line.indexOf(": ");
+                    if (idx != -1) {
+                        String key = line.substring(0, idx).trim();
+                        String value = line.substring(idx + 1).trim();
+                        headerMap.put(key, value);
+                    }
                 }
             }
             System.out.println("}\n all header read! \n");
@@ -69,37 +81,15 @@ public class ResponseReader implements Runnable {
             }
 
             // body Parsing
+            System.out.println("body: " + body.toString());
             System.out.println("start to read body: {\n" );
-            StringBuilder body = new StringBuilder();
             ObjectMapper objectMapper = new ObjectMapper();
-            while ((line = reader.readLine()) != null)  {
-                body.append(line);
-//                if (headerMap.containsKey("Content-Length")) {
-//                    int contentLength = Integer.parseInt(headerMap.get("Content-Length"));
-//                    System.out.println("contentLength: " + contentLength);
-//                    char[] bodyChars = new char[contentLength];
-//                    int charsRead, remainingLength = contentLength;
-//
-//                    while (remainingLength > 0 && (charsRead = reader.read(bodyChars, contentLength - remainingLength, remainingLength)) != -1) {
-//                        body.append(bodyChars, contentLength - remainingLength, charsRead);
-//                        remainingLength -= charsRead;
-//                    }
-//                }
-            }
 
 
-            Map<String, Object> bodyMap = new HashMap<>();
-            if (!body.isEmpty()) {
-                bodyMap = objectMapper.readValue(body.toString(), new TypeReference<Map<String, Object>>() {
-                });
-                for (String key : bodyMap.keySet()) {
-                    System.out.println(key + " " + bodyMap.get(key));
-                }
-            }
 
             System.out.println("]return request!! \n");
 
-            return new ResponseMessage(protocol, statusCode, statusPhrase, headerMap, bodyMap);
+            return new ResponseMessage(protocol, statusCode, statusPhrase, headerMap, null);
 
         } catch (IOException e) {
             System.out.println("ResponseReader error: " + e.getMessage());
