@@ -18,7 +18,6 @@ public class RequestReader {
             DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
 
             // read Request packet
-            StringBuilder requestBuilder = new StringBuilder();
             String line;
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(dataInputStream));
 
@@ -30,7 +29,7 @@ public class RequestReader {
                 if (pivot == -1) {
                     // read Request Line
                     String[] requestLine = line.split(" ");
-                    String method = requestLine[0];
+                    String method = requestLine[0].toUpperCase();
                     String uri = requestLine[1];
                     String protocol = requestLine[2];
 

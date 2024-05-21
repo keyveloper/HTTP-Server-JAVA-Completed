@@ -7,62 +7,64 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 
 @AllArgsConstructor
 public class RequestHandler {
-    private final ClientHandler clientHandler;
 
-    public void handleRequest(RequestMessage requestMessage) {
-        System.out.println("handle Request start!! \n" + requestMessage);
-        System.out.println("handle" + requestMessage.getMethod() + " " + requestMessage.getUri());
-        switch (requestMessage.getMethod()) {
-            case "GET" -> handleGet(requestMessage);
+    public Response handleRequest(Request request) {
+        System.out.println("start to handleRequest!!");
+        switch (request.getMethod()) {
+            case "GET" -> {
+                return handleGet(request.getUri());
+            }
+            case "POST" -> handlePost(request.getUri(), request.getBodyBytes());
+            case "DELETE" -> handleDelete(request.getUri());
 
-            case "POST" -> handlePost(requestMessage.getUri(), requestMessage.getBodyMap());
 
-            case "Delete" -> handleDelete(requestMessage.getUri());
+        }
+        // send error status!
+        return null;
+    }
+
+    private Response handleGet(String uri) {
+        if (uri.startsWith("/time")) {
+            return responseTime();
         }
     }
 
-    private void handleGet(RequestMessage requestMessage) {
-        if (requestMessage.getUri().startsWith("/time")) {
-            sendTimeResponse(requestMessage.getProtocol());
-        }
-    }
-
-    private void handlePost(String uri, Map<String, Object> bodyMap) {
+    private Response handlePost(String uri, byte[] body) {
 
     }
 
-    private void handleDelete(String uri) {
+    private Response handleDelete(String uri) {
 
     }
 
-    private void sendTimeResponse(String protocol) {
+    private Response responseTime() {
         System.out.println("start to send Time response!! \n");
-        String body = getNowTime();
-        if (body == null) {
-            Response response = new Response(protocol, StatusCode.SERVICE_UNAVAILABLE, null);
-            clientHandler.sendHttpResponse(response);
-            return;
-        }
-        Response response = new Response(protocol, StatusCode.OK, body);
-        response.setBodyLength(body.length());
-        response.setBodyType("application/json");
-        System.out.println("Response made: " + response + "\n");
-        System.out.println("Response JsonBody: " + body);
-        clientHandler.sendHttpResponse(response);
-    }
+        Response response;
+        LocalDateTime now = LocalDateTime.now();
+        String formattedNow = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        System.out.println("now: " + formattedNow);
 
-    private String getNowTime() {
+        // Json
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put("currentTime", formattedNow);
+
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            LocalDateTime now = LocalDateTime.now();
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
-            return objectMapper.writeValueAsString(now);
+            String jsonResponse = objectMapper.writeValueAsString(responseMap);
+
+            response = new Response(StatusCode.OK);
+            response.setBodyLength(jsonResponse.length());
+            response.setBodyType("application/json");
+            response.setJsonResponseBody(jsonResponse);
+            return response;
         } catch (JsonProcessingException e) {
-            System.out.println("getNowTime error: " + e.getMessage());
+            System.out.println("Request Handler - responseTime error: " + e.getMessage());
         }
         return null;
     }
