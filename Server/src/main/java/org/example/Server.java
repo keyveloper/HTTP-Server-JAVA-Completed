@@ -4,6 +4,7 @@ package org.example;
 import lombok.Data;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -15,8 +16,9 @@ public class Server {
     public void start() {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
+
+            System.out.println("[Waiting Client,,,]");
             while (true) {
-                System.out.println("[Waiting Client,,,]");
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Connected " + clientSocket.getLocalPort() + " Port, From " +
                         clientSocket.getRemoteSocketAddress().toString() + "\n");

@@ -15,7 +15,6 @@ public class ResponseSender {
         System.out.println("[Request Sender]\n send ResponsePacket: "+ Arrays.toString(httpResponsePacket));
         try {
             DataOutputStream dateOutputStream = new DataOutputStream(clientSocket.getOutputStream());
-            dateOutputStream.writeInt(httpResponsePacket.length);
             dateOutputStream.write(httpResponsePacket);
             dateOutputStream.flush();
         } catch (IOException e) {

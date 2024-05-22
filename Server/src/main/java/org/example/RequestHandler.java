@@ -33,14 +33,15 @@ public class RequestHandler {
         if (uri.startsWith("/time")) {
             return responseTime();
         }
+        return null;
     }
 
     private Response handlePost(String uri, byte[] body) {
-
+        return null;
     }
 
     private Response handleDelete(String uri) {
-
+        return null;
     }
 
     private Response responseTime() {

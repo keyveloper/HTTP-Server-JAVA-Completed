@@ -1,7 +1,6 @@
 package org.example;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -17,24 +16,20 @@ public class ClientHandler implements Runnable{
         try {
             while (true) {
                 Request request = requestReader.readRequest();
-                if (!processRequest(request)) {
+                if (!isValidRequest(request)) {
                     client.close();
-
                     break;
                 }
+                response(request);
             }
         } catch (IOException e) {
             System.out.println("Client Handler Error: " + e.getMessage());
         }
     }
 
-    private int processRequest(Request request) {
-        if (!Objects.equals(request.getProtocol(), "HTTP/1.1") || request.getMethod() == null || request.getUri() == null) {
-            return 0;
-        } else {
-            response(request);
-            return 1;
-        }
+    private boolean isValidRequest(Request request) {
+        return Objects.equals(request.getProtocol(), "HTTP/1.1") && request.getMethod() !=
+                null && request.getUri() != null;
     }
 
     private void response(Request request) {
