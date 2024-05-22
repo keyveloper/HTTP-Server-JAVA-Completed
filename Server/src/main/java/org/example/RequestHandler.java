@@ -5,13 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-@AllArgsConstructor
+@NoArgsConstructor
 public class RequestHandler {
 
     public Response handleRequest(Request request) {
@@ -22,6 +23,9 @@ public class RequestHandler {
             }
             case "POST" -> handlePost(request.getUri(), request.getBodyBytes());
             case "DELETE" -> handleDelete(request.getUri());
+            default -> {
+                return null;
+            }
 
 
         }

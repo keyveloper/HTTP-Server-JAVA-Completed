@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.net.Socket;
 import java.util.Map;
 
 @Data
@@ -15,4 +16,5 @@ public class Request {
     private String protocol;
     private Map<String, String> headerMap;
     private byte[] bodyBytes;
+    private Socket clientSocket;
 }
