@@ -15,6 +15,5 @@ public class Request {
     private String uri;
     private String protocol;
     private Map<String, String> headerMap;
-    private byte[] bodyBytes;
-    private Socket clientSocket;
+    private String body;
 }

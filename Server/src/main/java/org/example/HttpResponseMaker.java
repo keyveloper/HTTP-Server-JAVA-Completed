@@ -8,12 +8,12 @@ public class HttpResponseMaker {
                 .append(response.getStatusCode().getReasonPhrase()).append("\r\n")
         // essential Body
                 .append("Date: ").append(new java.util.Date()).append("\r\n");
-        if (response.getJsonResponseBody() != null){
+        if (response.getBody() != null){
             responseString.append("Content-Type: ").append(response.getBodyType()).append("\r\n")
                     .append("Content-Length: ").append(response.getBodyLength()).append("\r\n")
                     .append("Connection: close\r\n")
                     .append("\r\n");
-            responseString.append(response.getJsonResponseBody());
+            responseString.append(response.getBody());
             return responseString.toString().getBytes();
         }
         responseString.append("Connection: close\r\n").append("\r\n");

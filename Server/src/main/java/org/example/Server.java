@@ -14,50 +14,20 @@ import java.util.logging.Logger;
 @Data
 public class Server {
     private final int port = 8080;
+    private final RequestHandler requestHandler = new RequestHandler();
 
     public void start() {
         int port = 8080;
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server is running on port " + port);
 
+        try {
+            ServerSocket serverSocket = new ServerSocket(port);
+            System.out.println("[waiting Client]");
             while (true) {
-                try (Socket clientSocket = serverSocket.accept()) {
-                    System.out.println("Accepted connection from " + clientSocket.getRemoteSocketAddress());
-
-                    // Read the request (optional, for logging or processing)
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    String line;
-                    Map<String, String> headerMap = new HashMap<>();
-                    while (true) {
-                        line = reader.readLine();
-                        if (line == null || line.isEmpty()) {
-                            break;
-                        }
-                        System.out.println(line);
-                        if (line.contains(":")) {
-                            String[] header = line.split(":");
-                            headerMap.put(header[0].trim().toLowerCase(), header[1].trim());
-                        }
-                    }
-
-                    if (headerMap.containsKey("content-length")) {
-                        int contentLength = Integer.parseInt(headerMap.get("content-length"));
-                        char[] body = new char[contentLength];
-                        reader.read(body, 0, contentLength);
-                        System.out.println("Body: " + new String(body));
-                    }
-
-                    // Write a response
-                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Content-Type: text/html; charset=utf-8");
-                    out.println();
-                    out.println("<html><body><h1>Hello, World!</h1></body></html>");
-
-                    out.close();
-                } catch (IOException e) {
-                    System.out.println("Error handling client: " + e.getMessage());
-                }
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("Accepted connection from " + clientSocket.getRemoteSocketAddress());
+                ClientHandler clientHandler = new ClientHandler(clientSocket, requestHandler);
+                Thread handlerThread = new Thread(clientHandler);
+                handlerThread.start();
             }
         } catch (IOException e) {
             System.out.println("Could not listen on port " + port);
