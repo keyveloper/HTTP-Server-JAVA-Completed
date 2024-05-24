@@ -12,7 +12,8 @@ import java.util.Arrays;
 public class ResponseSender {
     private final Socket clientSocket;
     public void sendHttpResponse(byte[] httpResponsePacket) {
-        System.out.println("[Request Sender]\n send ResponsePacket: "+ Arrays.toString(httpResponsePacket));
+
+        System.out.println("[Request Sender]\n send ResponsePacket: "+ Arrays.toString(httpResponsePacket) + "\nString: " + new String(httpResponsePacket));
         try {
             DataOutputStream dateOutputStream = new DataOutputStream(clientSocket.getOutputStream());
             dateOutputStream.write(httpResponsePacket);

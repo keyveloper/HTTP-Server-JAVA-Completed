@@ -44,7 +44,6 @@ public class TextManager {
 
     public String getAll() {
         ObjectMapper objectMapper = new ObjectMapper();
-
         String jsonData;
         synchronized (textLock) {
             try {
@@ -55,6 +54,12 @@ public class TextManager {
             }
         }
         return null;
+    }
+
+    public void print() {
+        for (String key: textMap.keySet()) {
+            System.out.println(key + ": " + textMap.get(key));
+        }
     }
 
 

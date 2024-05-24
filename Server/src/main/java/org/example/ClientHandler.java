@@ -35,6 +35,7 @@ public class ClientHandler implements Runnable{
 
     private void response(Request request) {
         Response response = requestHandler.handleRequest(request);
+        System.out.println("\n[Response made]\nresponse: " + response);
         if (response == null) {
             sendHttpResponse(new Response(StatusCode.NOT_FOUND));
             return;

@@ -19,29 +19,34 @@ public class RequestHandler {
             case "GET" -> {
                 return handleGet(request.getUri());
             }
-            case "POST" -> handlePost(request.getUri(), request.getBody());
-            case "DELETE" -> handleDelete(request.getUri());
+            case "POST" -> {
+                return handlePost(request.getUri(), request.getBody());
+            }
+            case "DELETE" -> {
+                return handleDelete(request.getUri());
+            }
+
             default -> {
-                return null;
+                return new Response(StatusCode.NOT_FOUND);
             }
 
 
         }
-        // send error status!
-        return null;
     }
 
     private Response handleGet(String uri) {
+        System.out.println("<handleGET>\nuri: " + uri + "\n");
         if (uri.startsWith("/time")) {
             return responseGetTime();
         }
 
-        if (uri.startsWith("/text")) {
-            return responseGetText(uri.substring(5));
+        if (uri.startsWith("/textall")) {
+            System.out.println("response All text \nuri: " + uri);
+            return responseGetAllText();
         }
 
-        if (uri.startsWith("/textall")) {
-            return responseGetAllText();
+        if (uri.startsWith("/text")) {
+            return responseGetText(uri.substring(5));
         }
 
         if (uri.startsWith("/image")) {
@@ -55,6 +60,8 @@ public class RequestHandler {
             String textKey = parameter.substring(1);
 
             String body = textManager.get(textKey);
+            textManager.print();
+            System.out.println("<responseGetText>\ntextKey: " + textKey + "\nresult: " +  body);
             if (body == null) {
                 return new Response(StatusCode.NOT_FOUND);
             }
@@ -69,10 +76,13 @@ public class RequestHandler {
     }
 
     private Response responseGetAllText() {
+        System.out.println("\n<<start get All>>\n");
         if (textManager.isEmpty()) {
+            System.out.println("textMap is empty");
             return new Response(StatusCode.NOT_FOUND);
         }
         String jsonBody = textManager.getAll();
+        System.out.println("<getAll>\njsonBody: " + jsonBody);
         Response response = new Response(StatusCode.OK);
         response.setBodyLength(jsonBody.length());
         response.setBodyType("application/json");
@@ -88,7 +98,8 @@ public class RequestHandler {
     }
 
     private Response postText(String parameter, String body) {
-        if (textManager.put(parameter, body)) {
+        if (textManager.put(parameter.substring(1), body)) {
+            textManager.print();
             return new Response(StatusCode.OK);
         }
 
@@ -103,7 +114,7 @@ public class RequestHandler {
     }
 
     private Response deleteText(String parameter) {
-        if (textManager.remove(parameter)) {
+        if (textManager.remove(parameter.substring(1))) {
             return new Response(StatusCode.OK);
         }
         return new Response(StatusCode.NOT_FOUND);
