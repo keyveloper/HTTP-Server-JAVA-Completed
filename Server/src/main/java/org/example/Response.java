@@ -8,5 +8,5 @@ public class Response {
     private final StatusCode statusCode;
     private int bodyLength;
     private String bodyType;
-    private String body;
+    private byte[] body;
 }

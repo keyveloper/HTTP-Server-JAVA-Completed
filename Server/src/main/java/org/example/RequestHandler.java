@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -50,9 +53,27 @@ public class RequestHandler {
         }
 
         if (uri.startsWith("/image")) {
-            return null;
+            return responseGetImage();
         }
         return null;
+    }
+
+    private Response responseGetImage() {
+        String imagePath = "C:\\Users\\user\\Desktop\\backEndLearn\\HTTP_server\\img\\test.jpeg";
+        File file = new File(imagePath);
+        if (!file.exists()) {
+            return new Response(StatusCode.NOT_FOUND);
+        }
+        try {
+            byte[] imageBytes = Files.readAllBytes(file.toPath());
+            Response response = new Response(StatusCode.OK);
+            response.setBodyType("image/jpeg");
+            response.setBodyLength(imageBytes.length);
+            response.setBody(imageBytes);
+            return response;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Response responseGetText(String parameter) {
@@ -68,7 +89,7 @@ public class RequestHandler {
             Response response = new Response(StatusCode.OK);
             response.setBodyLength(body.length());
             response.setBodyType("text/plain");
-            response.setBody(body);
+            response.setBody(body.getBytes());
             return response;
         }
         // return error response;
@@ -86,7 +107,7 @@ public class RequestHandler {
         Response response = new Response(StatusCode.OK);
         response.setBodyLength(jsonBody.length());
         response.setBodyType("application/json");
-        response.setBody(jsonBody);
+        response.setBody(jsonBody.getBytes());
         return response;
     }
 
@@ -138,7 +159,7 @@ public class RequestHandler {
             response = new Response(StatusCode.OK);
             response.setBodyLength(jsonResponse.length());
             response.setBodyType("application/json");
-            response.setBody(jsonResponse);
+            response.setBody(jsonResponse.getBytes());
             return response;
         } catch (JsonProcessingException e) {
             System.out.println("Request Handler - responseTime error: " + e.getMessage());
