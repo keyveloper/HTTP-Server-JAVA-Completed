@@ -121,7 +121,7 @@ public class RequestHandler {
     private Response postText(String parameter, String body) {
         if (textManager.put(parameter.substring(1), body)) {
             textManager.print();
-            return new Response(StatusCode.OK);
+            return new Response(StatusCode.CREATED);
         }
 
         return new Response(StatusCode.SERVICE_UNAVAILABLE);
@@ -136,7 +136,7 @@ public class RequestHandler {
 
     private Response deleteText(String parameter) {
         if (textManager.remove(parameter.substring(1))) {
-            return new Response(StatusCode.OK);
+            return new Response(StatusCode.NO_CONTENT);
         }
         return new Response(StatusCode.NOT_FOUND);
     }

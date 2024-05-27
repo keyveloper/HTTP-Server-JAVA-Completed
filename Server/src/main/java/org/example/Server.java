@@ -24,7 +24,7 @@ public class Server {
             System.out.println("[waiting Client]");
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Accepted connection from " + clientSocket.getRemoteSocketAddress());
+                System.out.println("[Accepted connection from]\n" + clientSocket.getRemoteSocketAddress());
                 ClientHandler clientHandler = new ClientHandler(clientSocket, requestHandler);
                 Thread handlerThread = new Thread(clientHandler);
                 handlerThread.start();

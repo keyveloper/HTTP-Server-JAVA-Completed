@@ -56,16 +56,6 @@ public class RequestReader {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-
-
-//        // Write a response
-//        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-//        out.println("HTTP/1.1 200 OK");
-//        out.println("Content-Type: text/html; charset=utf-8");
-//        out.println();
-//        out.println("<html><body><h1>Hello, World!</h1></body></html>");
-
-
     }
 }
 
