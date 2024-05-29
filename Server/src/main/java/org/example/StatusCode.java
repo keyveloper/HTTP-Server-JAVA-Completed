@@ -10,8 +10,8 @@ public enum StatusCode {
     NOT_FOUND(404, "Not found"),
     BAD_REQUEST(400, "Bad Request"),
     INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
-    SERVICE_UNAVAILABLE(503, "Service Unavailable");
-
+    SERVICE_UNAVAILABLE(503, "Service Unavailable"),
+    ACCEPTED(202, "Accepted");
 
     private final int code;
     private final String reasonPhrase;

@@ -2,20 +2,15 @@ package org.example;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-@Data
+@NoArgsConstructor
 public class RequestHandler {
-    private final TextManager textManager = new TextManager();
-
     public Response handleRequest(Request request) {
         System.out.println("start to handleRequest!!");
         switch (request.getMethod()) {
@@ -30,113 +25,104 @@ public class RequestHandler {
             }
 
             default -> {
-                return new Response(StatusCode.NOT_FOUND);
+                return new Response(StatusCode.BAD_REQUEST);
             }
-
-
         }
     }
 
+
     private Response handleGet(String uri) {
         System.out.println("<handleGET>\nuri: " + uri + "\n");
-        if (uri.startsWith("/time")) {
+        if (uri.equals("/time")) {
             return responseGetTime();
         }
 
-        if (uri.startsWith("/textall")) {
+        if (uri.equals("/textall")) {
             System.out.println("response All text \nuri: " + uri);
             return responseGetAllText();
         }
 
-        if (uri.startsWith("/text")) {
-            return responseGetText(uri.substring(5));
+        if (uri.startsWith("/text") && uri.substring(5).startsWith("/")) {
+            return getText(uri.substring(6));
         }
 
-        if (uri.startsWith("/image")) {
-            return responseGetImage();
+        if (uri.startsWith("/image") && uri.substring(5).startsWith("/")) {
+            return responseGetImage(uri.substring(6));
         }
-        return null;
+        return new Response(StatusCode.NO_CONTENT);
     }
 
-    private Response responseGetImage() {
-        String imagePath = "C:\\Users\\user\\Desktop\\backEndLearn\\HTTP_server\\img\\test.jpeg";
-        File file = new File(imagePath);
-        if (!file.exists()) {
+    private Response responseGetImage(String parameter) {
+        byte[] imageBytes = DataBaseManager.getImage(Integer.parseInt(parameter));
+        if (imageBytes == null) {
+            return new Response(StatusCode.BAD_REQUEST);
+        }
+        Response response = new Response(StatusCode.OK);
+        response.setBodyType("image/jpeg");
+        response.setBodyLength(imageBytes.length);
+        response.setBody(imageBytes);
+        return response;
+    }
+
+    private Response getText(String parameter) {
+        // check valid parameter path
+        String body = DataBaseManager.getText(parameter);
+        System.out.println("<responseGetText>\ntextKey: " + parameter + "\nresult: " +  body);
+        if (body == null) {
             return new Response(StatusCode.NOT_FOUND);
         }
-        try {
-            byte[] imageBytes = Files.readAllBytes(file.toPath());
-            Response response = new Response(StatusCode.OK);
-            response.setBodyType("image/jpeg");
-            response.setBodyLength(imageBytes.length);
-            response.setBody(imageBytes);
-            return response;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Response responseGetText(String parameter) {
-        if (parameter.startsWith("/")) {
-            String textKey = parameter.substring(1);
-
-            String body = textManager.get(textKey);
-            textManager.print();
-            System.out.println("<responseGetText>\ntextKey: " + textKey + "\nresult: " +  body);
-            if (body == null) {
-                return new Response(StatusCode.NOT_FOUND);
-            }
-            Response response = new Response(StatusCode.OK);
-            response.setBodyLength(body.length());
-            response.setBodyType("text/plain");
-            response.setBody(body.getBytes());
-            return response;
-        }
-        // return error response;
-        return new Response(StatusCode.NOT_FOUND);
+        Response response = new Response(StatusCode.OK);
+        response.setBodyLength(body.length());
+        response.setBodyType("text/plain");
+        response.setBody(body.getBytes());
+        return response;
     }
 
     private Response responseGetAllText() {
         System.out.println("\n<<start get All>>\n");
-        if (textManager.isEmpty()) {
-            System.out.println("textMap is empty");
-            return new Response(StatusCode.NOT_FOUND);
+        ObjectMapper objectMapper = new ObjectMapper();
+        HashMap<String, String> textsMap = DataBaseManager.getTextAll();
+        if (textsMap.isEmpty()) {
+            return new Response(StatusCode.NO_CONTENT);
         }
-        String jsonBody = textManager.getAll();
-        System.out.println("<getAll>\njsonBody: " + jsonBody);
-        Response response = new Response(StatusCode.OK);
-        response.setBodyLength(jsonBody.length());
-        response.setBodyType("application/json");
-        response.setBody(jsonBody.getBytes());
-        return response;
+
+        try {
+            String jsonTexts = objectMapper.writeValueAsString(textsMap);
+            System.out.println("<getAll>\njsonBody: " + jsonTexts);
+            Response response = new Response(StatusCode.OK);
+            response.setBodyLength(jsonTexts.length());
+            response.setBodyType("application/json");
+            response.setBody(jsonTexts.getBytes());
+        } catch (JsonProcessingException e) {
+            System.out.println("Request Handler: responseGetAllText() err" + e.getMessage());
+        }
+        return new Response(StatusCode.SERVICE_UNAVAILABLE);
     }
 
     private Response handlePost(String uri, String body) {
-        if (uri.startsWith("/text")) {
-            return postText(uri.substring(5), body);
+        if (uri.startsWith("/text") && uri.substring(5).startsWith("/")) {
+            return postText(uri.substring(6), body);
         }
         return new Response(StatusCode.NOT_FOUND);
     }
 
     private Response postText(String parameter, String body) {
-        if (textManager.put(parameter.substring(1), body)) {
-            textManager.print();
+        if (DataBaseManager.putText(parameter, body)) {
             return new Response(StatusCode.CREATED);
         }
-
         return new Response(StatusCode.SERVICE_UNAVAILABLE);
     }
 
     private Response handleDelete(String uri) {
-        if (uri.startsWith("/text")) {
+        if (uri.equals("/text")) {
             return deleteText(uri.substring(5));
         }
         return new Response(StatusCode.NOT_FOUND);
     }
 
     private Response deleteText(String parameter) {
-        if (textManager.remove(parameter.substring(1))) {
-            return new Response(StatusCode.NO_CONTENT);
+        if (DataBaseManager.deleteText(parameter)) {
+            return new Response(StatusCode.ACCEPTED);
         }
         return new Response(StatusCode.NOT_FOUND);
     }
