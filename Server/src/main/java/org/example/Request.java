@@ -15,5 +15,5 @@ public class Request {
     private String uri;
     private String protocol;
     private Map<String, String> headerMap;
-    private String body;
+    private byte[] body;
 }

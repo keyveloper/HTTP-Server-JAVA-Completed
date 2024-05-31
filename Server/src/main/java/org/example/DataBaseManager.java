@@ -130,7 +130,7 @@ public class DataBaseManager {
 
             HashMap<String, String > results = new HashMap<>();
             while (resultSet.next()) {
-                String key = resultSet.getString("text_key");
+                String key = resultSet.getString("text_id");
                 String value = resultSet.getString("text_value");
                 results.put(key, value);
             }

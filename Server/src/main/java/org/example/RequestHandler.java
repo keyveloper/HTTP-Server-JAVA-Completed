@@ -64,10 +64,10 @@ public class RequestHandler {
         return response;
     }
 
-    private Response getText(String parameter) {
+    private Response getText(String key) {
         // check valid parameter path
-        String body = DataBaseManager.getText(parameter);
-        System.out.println("<responseGetText>\ntextKey: " + parameter + "\nresult: " +  body);
+        String body = DataBaseManager.getText(key);
+        System.out.println("<responseGetText>\ntextKey: " + key + "\nresult: " +  body);
         if (body == null) {
             return new Response(StatusCode.NOT_FOUND);
         }
@@ -93,21 +93,34 @@ public class RequestHandler {
             response.setBodyLength(jsonTexts.length());
             response.setBodyType("application/json");
             response.setBody(jsonTexts.getBytes());
+
+            return response;
         } catch (JsonProcessingException e) {
             System.out.println("Request Handler: responseGetAllText() err" + e.getMessage());
         }
         return new Response(StatusCode.SERVICE_UNAVAILABLE);
     }
 
-    private Response handlePost(String uri, String body) {
+    private Response handlePost(String uri, byte[] body) {
         if (uri.startsWith("/text") && uri.substring(5).startsWith("/")) {
             return postText(uri.substring(6), body);
+        }
+
+        if (uri.equals("/image")) {
+            return postImage(body);
         }
         return new Response(StatusCode.NOT_FOUND);
     }
 
-    private Response postText(String parameter, String body) {
-        if (DataBaseManager.putText(parameter, body)) {
+    private Response postImage(byte[] body) {
+        if (DataBaseManager.putImage(body)) {
+            return new Response(StatusCode.CREATED);
+        }
+        return new Response(StatusCode.SERVICE_UNAVAILABLE);
+    }
+
+    private Response postText(String parameter, byte[] body) {
+        if (DataBaseManager.putText(parameter, new String(body))) {
             return new Response(StatusCode.CREATED);
         }
         return new Response(StatusCode.SERVICE_UNAVAILABLE);
