@@ -114,14 +114,14 @@ public class RequestHandler {
     }
 
     private Response handleDelete(String uri) {
-        if (uri.equals("/text")) {
-            return deleteText(uri.substring(5));
+        if (uri.startsWith("/text") && uri.substring(5).startsWith("/")) {
+            return deleteText(uri.substring(6));
         }
         return new Response(StatusCode.NOT_FOUND);
     }
 
-    private Response deleteText(String parameter) {
-        if (DataBaseManager.deleteText(parameter)) {
+    private Response deleteText(String key) {
+        if (DataBaseManager.deleteText(key)) {
             return new Response(StatusCode.ACCEPTED);
         }
         return new Response(StatusCode.NOT_FOUND);

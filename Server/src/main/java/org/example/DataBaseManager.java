@@ -12,10 +12,9 @@ public class DataBaseManager {
     private static final Object dataBaseLock = new Object();
     private final String url = "jdbc:mariadb://localhost:3306/http";
     private final String user = "root";
-    private final String password = "1234";
+    private final String password = "3353";
 
     private DataBaseManager() {
-        System.out.println("url: " + url);
         startConnect();
     }
     private void startConnect() {
@@ -23,7 +22,7 @@ public class DataBaseManager {
             this.connection = DriverManager.getConnection(url, user, password);
             System.out.println("connecting success");
         } catch (SQLException e) {
-            System.out.println("DataBaseManger - sql err: " + e.getMessage());
+            System.out.println("<<DataBaseManger>>\n - sql err: " + e.getMessage() + "\n");
         }
     }
 
